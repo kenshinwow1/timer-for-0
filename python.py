@@ -1,32 +1,48 @@
-from tkinter import *
-from time import *
+import tkinter as tk
+from datetime import datetime
+from datetime import timedelta
 
-def update():
-    time_string = strftime("%I:%M:%S %p")
-    time_label.config(text=time_string)
+class StopwatchApp:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Секундомер")
 
-    day_string = strftime("%A")
-    day_label.config(text=day_string)
+        self.is_running = False
+        self.start_time = None
 
-    date_string = strftime("%B %d, %Y")
-    date_label.config(text=date_string)
+        self.label = tk.Label(master, text="0:00:00", font=("Helvetica", 48))
+        self.label.pack(pady=20)
 
-    window.after(1000,update)
+        self.start_button = tk.Button(master, text="Старт", command=self.start_stop)
+        self.start_button.pack(side=tk.LEFT, padx=10)
 
+        self.reset_button = tk.Button(master, text="Сброс", command=self.reset)
+        self.reset_button.pack(side=tk.RIGHT, padx=10)
 
-window = Tk()
+        self.update()
 
-time_label = Label(window,font=("Arial",50),fg="#00FF00",bg="black")
-time_label.pack()
+    def start_stop(self):
+        if self.is_running:
+            self.is_running = False
+        else:
+            self.is_running = True
+            self.start_time = datetime.now()
 
-day_label = Label(window,font=("Ink Free",25,"bold"))
-day_label.pack()
+    def reset(self):
+        self.is_running = False
+        self.start_time = None
 
-date_label = Label(window,font=("Ink Free",30))
-date_label.pack()
+    def update(self):
+        if self.is_running and self.start_time:
+            elapsed_time = datetime.now() - self.start_time
+            timer_str = str(timedelta(seconds=elapsed_time.seconds))
+            self.label.config(text=timer_str)
+        else:
+            self.label.config(text="0:00:00")
 
-update()
+        self.master.after(1000, self.update)
 
-window.mainloop()
-
-#clock
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = StopwatchApp(root)
+    root.mainloop()
